@@ -1,4 +1,7 @@
 const express = require('express');
+const bcrypt = require('bcrypt-nodejs'); 
+const cors = require('cors');
+
 const app = express();
 
 const database = {
@@ -22,15 +25,18 @@ const database = {
     ]
 };
 
+
+
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
 
     res.json(database);
 });
 
-app.post('/signin', (req, res) => {
+app.post('/signin', (req, res) => { 
     
     if (req.body.email === database.users[0].email
             && req.body.password === database.users[0].password) {
@@ -95,7 +101,6 @@ app.put('/image', (req, res) => {
         res.status(400).json('user not found');
     }
 });
-
 
 app.listen(3000, () => {
     
