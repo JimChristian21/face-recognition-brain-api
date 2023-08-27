@@ -108,22 +108,33 @@ app.get('/profile/:id', (req, res) => {
 app.put('/image', (req, res) => {
     
     const { id } = req.body;
-    let found = false;
+    
+    db.select('entries')
+        .from('users')
+        .where({id})
+        .then(user => {
 
-    database.users.forEach(user => {
+            if (user.length) {
 
-        if (user.id === id) {
-            
-            found = true;
-            user.entries++;
-            return res.json(user.entries);
-        }
-    });
+                db('users')
+                    .where('id', '=', id)
+                    .increment('entries', 1)
+                    .then(entries => {
+                        
+                        res.json('Added entries');
+                    })
+                    .catch(err => {
+                        res.status(400).json('Error getting entries');
+                    });
+            } else {
 
-    if (!found) {
+                res.json('User doesn\'t exist');
+            }
 
-        res.status(400).json('user not found');
-    }
+        }).catch(err => {
+
+            res.status(400).json('Error getting user');
+        });
 });
 
 app.listen(3000, () => {
