@@ -12,6 +12,10 @@ const db = knex({
       database : 'smart-brain'
     }
 });
+const registerController = require('./controllers/register');
+const signinController = require('./controllers/signin');
+const profileController = require('./controllers/profile');
+const imageController = require('./controllers/image');
 
 const app = express();
 
@@ -24,130 +28,13 @@ app.get('/', (req, res) => {
     
 });
 
-app.post('/signin', (req, res) => { 
+app.post('/signin', (req, res) => {signinController.handleSignin(req, res, db, bcrypt)});
 
-    const { email, password } = req.body; 
-    
-    db.select('email', 'hash')
-        .from('login')
-        .where('email', '=', email)
-        .then(data => {
+app.post('/register', (req, res) => {registerController.handleRegister(req, res, db, bcrypt)});
 
-            const isValid =  bcrypt.compareSync(password, data[0].hash);
-            
-            if (isValid) {
+app.get('/profile/:id', (req, res) => {profileController.getProfile(req, res, db)});
 
-                db.select('*')
-                    .from('users')
-                    .where('email', '=', data[0].email)
-                    .then(users => {
-
-                        res.json(users[0]);
-                    })
-                    .catch(err => {
-
-                        res.status(400).json('Unable to get user!');
-                    });
-            } else {
-
-                res.status(400).json('Invalid email or password!');
-            }
-        })
-        .catch(err => {
-
-            res.status(400).json('Unable to login!');
-        });
-});
-
-app.post('/register', (req, res) => {
-
-    const { name, email, password} = req.body;
-
-    const hash = bcrypt.hashSync(password);
-
-    db.transaction(trx => {
-        
-        trx.insert({
-            hash: hash,
-            email: email
-        }, 'email')
-        .into('login')
-        .then(userEmail => {
-            
-            return db.insert([
-                {
-                    name,
-                    email: userEmail[0].email,
-                    joined: new Date()
-                }
-            ], '*').into('users')
-            .then(user => {
-        
-                res.json(user[0]);
-            })
-        })
-        .then(trx.commit)
-        .catch(trx.rollback);
-    }).catch(err => {
-
-        res.status(400).json('Unable to register!');
-    });
-});
-
-app.get('/profile/:id', (req, res) => {
-    
-    const { id } = req.params;
-
-    db.select('*')
-        .from('users')
-        .where({
-            id: id
-        }).then(user => {
-
-            if (user.length) {
-
-                res.json(user[0]);
-            } else {
-
-                res.json('User doesn\'t exist');
-            }
-        }).catch(err => {
-
-            res.json('Error getting user');
-        });
-});
-
-app.put('/image', (req, res) => {
-    
-    const { id } = req.body;
-    
-    db.select('entries')
-        .from('users')
-        .where({id})
-        .then(user => {
-
-            if (user.length) {
-
-                db('users')
-                    .where('id', '=', id)
-                    .increment('entries', 1)
-                    .then(entries => {
-                        
-                        res.json(entries);
-                    })
-                    .catch(err => {
-                        res.status(400).json('Error getting entries');
-                    });
-            } else {
-
-                res.json('User doesn\'t exist');
-            }
-
-        }).catch(err => {
-
-            res.status(400).json('Error getting user');
-        });
-});
+app.put('/image', (req, res) => {imageController.incrementEntries(req, res, db)});
 
 app.listen(3000, () => {
     
