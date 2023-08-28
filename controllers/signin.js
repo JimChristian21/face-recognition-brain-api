@@ -8,6 +8,11 @@ const handleSignin = (req, res, db, bcrypt) => {
         .then(data => {
     
             const isValid =  bcrypt.compareSync(password, data[0].hash);
+
+            if (!email || !password) {
+
+                return res.status(400).json('Invalid inputs');
+            }
                         
             if (isValid) {
             
