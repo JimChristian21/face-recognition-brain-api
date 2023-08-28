@@ -133,7 +133,7 @@ app.put('/image', (req, res) => {
                     .increment('entries', 1)
                     .then(entries => {
                         
-                        res.json('Added entries');
+                        res.json(entries);
                     })
                     .catch(err => {
                         res.status(400).json('Error getting entries');
