@@ -42,7 +42,7 @@ app.post('/signin', (req, res) => {
                     .where('email', '=', data[0].email)
                     .then(users => {
 
-                        res.json(users);
+                        res.json(users[0]);
                     })
                     .catch(err => {
 
