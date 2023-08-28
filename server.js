@@ -13,34 +13,7 @@ const db = knex({
     }
 });
 
-db.select('*')
-    .from('users')
-    .then(data => console.log(data));
-
 const app = express();
-
-const database = {
-    users: [
-        {
-            id: '123',
-            name: 'John',
-            email: 'john@test.com',
-            password: 'cookies',
-            entries: 0,
-            joined: new Date()
-        },
-        {
-            id: '124',
-            name: 'Sally',
-            email: 'sally@test.com',
-            password: 'bananas',
-            entries: 0,
-            joined: new Date()
-        }
-    ]
-};
-
-
 
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
@@ -67,18 +40,34 @@ app.post('/register', (req, res) => {
 
     const { name, email, password} = req.body;
 
-    const x = db.insert([
-        {
-            name: name,
-            email: email,
-            joined: new Date()
-        }
-    ], '*').into('users')
-    .then(user => {
-        console.log(user);
-        res.json(user[0]);
+    const hash = bcrypt.hashSync(password);
+
+    db.transaction(trx => {
+        
+        trx.insert({
+            hash: hash,
+            email: email
+        }, 'email')
+        .into('login')
+        .then(userEmail => {
+            
+            return db.insert([
+                {
+                    name,
+                    email: userEmail[0].email,
+                    joined: new Date()
+                }
+            ], '*').into('users')
+            .then(user => {
+        
+                res.json(user[0]);
+            })
+        })
+        .then(trx.commit)
+        .catch(trx.rollback);
     }).catch(err => {
-        res.status(400).json('Unable to register');
+
+        res.status(400).json('Unable to register!');
     });
 });
 
