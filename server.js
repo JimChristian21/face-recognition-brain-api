@@ -5,7 +5,7 @@ const knex = require('knex');
 const db = knex({
     client: 'pg',
     connection: {
-      host : 'dpg-cjn07jthe99c73f011eg-a',
+      host : 'dpg-cjn07jthe99c73f011eg-a.singapore-postgres.render.com',
       port : 5432,
       user : 'face_recognition_app_db',
       password : 'znUuEZEvdZ6WBNy4WHnfuWbLEBcRJ0hi',
