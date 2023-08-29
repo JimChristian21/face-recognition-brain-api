@@ -9,8 +9,10 @@ const db = knex({
       port : 5432,
       user : 'face_recognition_app_db',
       password : 'znUuEZEvdZ6WBNy4WHnfuWbLEBcRJ0hi',
-      database : 'face_recognition_app_db_5apq'
-    }
+      database : 'face_recognition_app_db_5apq',
+      ssl: true,
+    },
+    pool: { min: 0, max: 50 }
 });
 const registerController = require('./controllers/register');
 const signinController = require('./controllers/signin');
