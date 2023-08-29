@@ -37,8 +37,8 @@ app.get('/profile/:id', (req, res) => {profileController.getProfile(req, res, db
 
 app.put('/image', (req, res) => {imageController.incrementEntries(req, res, db)});
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     
-    console.log(`App is running in port 3000`);
+    console.log(`App is running in port ${PORT}`);
 });
 
