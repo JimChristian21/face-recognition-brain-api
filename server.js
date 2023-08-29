@@ -5,17 +5,18 @@ const knex = require('knex');
 const db = knex({
     client: 'pg',
     connection: {
-      host : 'localhost',
+      host : 'dpg-cjn07jthe99c73f011eg-a',
       port : 5432,
-      user : 'PREDATOR HELIOS 300',
-      password : 'rieves21',
-      database : 'smart-brain'
+      user : 'face_recognition_app_db',
+      password : 'znUuEZEvdZ6WBNy4WHnfuWbLEBcRJ0hi',
+      database : 'face_recognition_app_db_5apq'
     }
 });
 const registerController = require('./controllers/register');
 const signinController = require('./controllers/signin');
 const profileController = require('./controllers/profile');
 const imageController = require('./controllers/image');
+const PORT = process.env.PORT;
 
 const app = express();
 
@@ -38,5 +39,6 @@ app.put('/image', (req, res) => {imageController.incrementEntries(req, res, db)}
 
 app.listen(3000, () => {
     
-    console.log('App is running in port 3000');
+    console.log(`App is running in port 3000`);
 });
+
